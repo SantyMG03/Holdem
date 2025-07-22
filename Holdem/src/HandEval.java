@@ -24,7 +24,7 @@ public class HandEval {
             handType = "Flush";
         }
 
-        // Verificar escaler
+        // Detectar escalera
         List<Card> sorted = new ArrayList<>(cards);
         sorted.sort(Comparator.comparing(Card::getRank));
         List<Card.Rank> uniqueRanks = sorted.stream().
@@ -32,23 +32,20 @@ public class HandEval {
                 .distinct()
                 .toList();
 
-        List<Card.Rank> ranks = Arrays.asList(Card.Rank.values());
-        for (int i = 0; i <= uniqueRanks.size() - 5; i++) {
-            int start = ranks.indexOf(uniqueRanks.get(i));
-            boolean straight = true;
-            for (int j = 1; j < 5; j++) {
-                if (i + j >= uniqueRanks.size() || ranks.indexOf(uniqueRanks.get(i + j)) != start + j) {
-                    straight = false;
-                    break;
-                }
-            }
-            if (straight) {
-                handType = "Straight";
-                List<Card.Rank> needed = uniqueRanks.subList(i, i + 5);
-                bestHand = sorted.stream()
-                        .filter(c -> needed.contains(c.getRank()))
-                        .limit(5)
-                        .toList();
+        List<Card> straight = findStraight(sorted);
+
+        // Verificar color o royal flush
+        if (flush != null) {
+            List<Card> flushSorted = new ArrayList<>(flush);
+            flushSorted.sort(Comparator.comparingInt(c -> c.getRank().getValue()));
+            List<Card> straightFlush = findStraight(flushSorted);
+
+            if (straightFlush != null) {
+                boolean isRoyal = straightFlush.stream()
+                        .anyMatch(c -> c.getRank() == Card.Rank.ACE) &&
+                        straightFlush.getFirst().getRank().getValue() == 10;
+
+                return new PokerHand(isRoyal ? "Royal Flush" : "Straight Flush", straightFlush);
             }
         }
 
@@ -81,5 +78,47 @@ public class HandEval {
         }
 
         return new PokerHand(handType, bestHand);
+    }
+
+    private static List<Card> findStraight(List<Card> cards) {
+        List<Card> unique = cards.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Card::getRank))),
+                        ArrayList::new));
+        if (unique.size() < 5) return null;
+
+        List<Card> straigth = new ArrayList<>();
+        for (int i = 0; i < unique.size(); i++) {
+            straigth.clear();
+            straigth.add(unique.get(i));
+            int expected = unique.get(i).getRank().getValue() + 1;
+
+            for (int j = 0; j < unique.size() && straigth.size() < 5; j++) {
+                int current = unique.get(j).getRank().getValue();
+                if (current == expected) {
+                    straigth.add(unique.get(j));
+                    expected ++;
+                } else if (current > expected) break;
+            }
+            if (straigth.size() >= 5)
+                return straigth.subList(0, 5);
+        }
+
+        // Hasta este punto detecta todas las escaleras menos la escalera baja -> A-2-3-4-5
+        boolean hasAce = unique.stream().anyMatch(c -> c.getRank() == Card.Rank.ACE);
+        boolean hasLowStraight = unique.stream().map(c -> c.getRank().getValue()).
+                collect(Collectors.toSet()).
+                containsAll(Arrays.asList(2, 3, 4, 5));
+        // Si efectivamente tiene el As y los valores 2, .., 5 devuelvo la lista
+        if (hasAce && hasLowStraight) {
+            List<Card> lowStraight = unique.stream()
+                    .filter(c -> c.getRank().getValue() == 2 || c.getRank().getValue() ==3 ||
+                                      c.getRank().getValue() == 4 || c.getRank().getValue() == 5 ||
+                                      c.getRank() == Card.Rank.ACE)
+                    .toList();
+            return lowStraight.size() >= 5 ? lowStraight.subList(0, 5) : null;
+        }
+
+        return null;
     }
 }
