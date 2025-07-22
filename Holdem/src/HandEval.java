@@ -68,10 +68,10 @@ public class HandEval {
             bestHand = trips.subList(0, 3);
         } else if (pairs.size() >= 4) {
             handType = "Two Pair";
-            bestHand = trips.subList(0, 4);
+            bestHand = pairs.subList(0, 4);
         } else if (pairs.size() >=2) {
             handType = "Pair";
-            bestHand = trips.subList(0, 2);
+            bestHand = pairs.subList(0, 2);
         }
 
         // Si no hay nada de lo anterior, tomamos la carta mas alta
