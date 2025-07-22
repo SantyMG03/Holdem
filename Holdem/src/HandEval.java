@@ -79,7 +79,7 @@ public class HandEval {
             cards.sort(Comparator.comparing(Card::getRank).reversed());
             bestHand = cards.subList(0, 1);
         }
-        
+
         return new PokerHand(handType, bestHand);
     }
 }
