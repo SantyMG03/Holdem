@@ -76,7 +76,7 @@ public class HandEval {
             } else {
                 full.addAll(pairs.getFirst());
             }
-            return new PokerHand("Full house", full);
+            return new PokerHand("Full House", full);
         }
 
         // Flush (Color) en caso de que no haya escalera de color
