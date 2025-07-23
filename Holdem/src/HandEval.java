@@ -49,6 +49,15 @@ public class HandEval {
             }
         }
 
+        // Poker
+        for (List<Card> group: rankGroups.values()) {
+            if (group.size() == 4) {
+                List<Card> best = new ArrayList<>(group);
+                best.add(highestExcluding(cards, group));
+                return new PokerHand("Four of a Kind", best);
+            }
+        }
+
         // Trios y parejas
         List<Card> pairs = new ArrayList<>();
         List<Card> trips = new ArrayList<>();
@@ -80,6 +89,24 @@ public class HandEval {
         return new PokerHand(handType, bestHand);
     }
 
+    /**
+     * Funcion para filtrar de un grupo
+     * @param pool total de cartas
+     * @param exclude cartas a excluir
+     * @return la carta mas alta
+     */
+    private static Card highestExcluding(List<Card> pool, List<Card> exclude) {
+        return pool.stream().
+                filter(c -> !exclude.contains(c)).
+                max(Comparator.comparingInt(c -> c.getRank().getValue()))
+                .orElse(null);
+    }
+
+    /**
+     * Funcion que devuelve una escalera dado un conjunto de cartas de entrada
+     * @param cards conjunto de cartas a comprobar
+     * @return la escalera si existe o null en caso contrario
+     */
     private static List<Card> findStraight(List<Card> cards) {
         List<Card> unique = cards.stream()
                 .collect(Collectors.collectingAndThen(
@@ -109,7 +136,7 @@ public class HandEval {
         boolean hasLowStraight = unique.stream().map(c -> c.getRank().getValue()).
                 collect(Collectors.toSet()).
                 containsAll(Arrays.asList(2, 3, 4, 5));
-        // Si efectivamente tiene el As y los valores 2, .., 5 devuelvo la lista
+        // Si efectivamente tiene el As y los valores 2, 3, 4, 5 -> devuelvo la lista
         if (hasAce && hasLowStraight) {
             List<Card> lowStraight = unique.stream()
                     .filter(c -> c.getRank().getValue() == 2 || c.getRank().getValue() ==3 ||
