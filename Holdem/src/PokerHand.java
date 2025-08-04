@@ -22,7 +22,7 @@ public class PokerHand implements Comparable<PokerHand> {
     private static final Map<String, Integer> HAND_RANKS = Map.of(
             "High Card", 1,
             "Pair",2,
-            "Two Pair", 3,
+            "Two pair", 3,
             "Three of a Kind", 4,
             "Straight", 5,
             "Flush", 6,
