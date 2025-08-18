@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        PokerTraining sim = new PokerTraining(4);
+        PokerTrainingHard sim = new PokerTrainingHard(4);
         while (true) {
             sim.playRound();
             System.out.println("\nQuieres jugar otra ronda? (s/n) ");
