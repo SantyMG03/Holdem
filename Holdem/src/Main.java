@@ -2,12 +2,14 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        PokerTrainingHard sim = new PokerTrainingHard(4);
-        while (true) {
-            sim.playRound();
-            System.out.println("\nQuieres jugar otra ronda? (s/n) ");
-            Scanner sc = new Scanner(System.in);
-            if (!sc.nextLine().trim().equalsIgnoreCase("s")) break;
-        }
+        TexasHoldemGame game = new TexasHoldemGame(3);
+        game.showStage(); // preflop
+        game.nextStage();
+        game.showStage(); // flop
+        game.nextStage();
+        game.showStage(); // turn
+        game.nextStage();
+        game.showStage(); // river
+        game.nextStage(); // showdown
     }
 }

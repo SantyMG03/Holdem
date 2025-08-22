@@ -1,0 +1,84 @@
+import java.util.*;
+
+public class TexasHoldemGame {
+    private Deck deck;
+    private List<Player> players;
+    private List<Card> communityCards;
+    private int stage; // preflop=0, flop=1, turn=2, river=3, showdown=3
+
+    public TexasHoldemGame(int numPlayers) {
+        this.deck = new Deck();
+        this.players = new ArrayList<>();
+        this.communityCards = new ArrayList<>();
+        this.stage = 0;
+
+        for (int i = 1; i <= numPlayers; i++) {
+            Player p = new Player("Jugador " + i);
+            p.addCard(deck.draw());
+            p.addCard(deck.draw());
+            players.add(p);
+        }
+    }
+
+    public void showStage() {
+        System.out.println("\n=== Etapa: " + stageName() + " ===");
+
+        // cartas comunitarias hasta el momento
+        if (!communityCards.isEmpty()) {
+            System.out.println("Comunitarias: " + communityCards);
+        }
+
+        // cartas privadas de cada jugador
+        for (Player p: players) {
+            System.out.println(p.getName() + " -> " +p.getHand());
+        }
+    }
+
+    public void nextStage() {
+        switch (stage) {
+            case 0: // Flop
+                communityCards.add(deck.draw());
+                communityCards.add(deck.draw());
+                communityCards.add(deck.draw());
+                stage = 1;
+                break;
+            case 1: // Turn
+                communityCards.add(deck.draw());
+                stage = 2;
+                break;
+            case 2: // River
+                communityCards.add(deck.draw());
+                stage = 3;
+                break;
+            case 3:
+                showdown();
+                stage = 4;
+                break;
+            default:
+                System.out.println("La partida ha terminado");
+        }
+    }
+
+    private void showdown() {
+        System.out.println("\n=== SHOWDOWN ===");
+        System.out.println("Comunitarias: " + communityCards);
+
+        for (Player p: players) {
+            List<Card> hand = new ArrayList<>(p.getHand());
+            hand.addAll(communityCards);
+            PokerHand eval = HandEval.evaluate(hand);
+            System.out.println(p.getName() + " -> " + eval);
+        }
+    }
+
+    public String stageName() {
+        return switch (stage) {
+            case 0 -> "Preflop";
+            case 1 -> "Flop";
+            case 2 -> "Turn";
+            case 3 -> "River";
+            case 4 -> "Showdown";
+            default -> "Finalizado";
+        };
+    }
+}
