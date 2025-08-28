@@ -63,12 +63,22 @@ public class TexasHoldemGame {
         System.out.println("\n=== SHOWDOWN ===");
         System.out.println("Comunitarias: " + communityCards);
 
+        Map<Player, PokerHand> results = new HashMap<>();
+
         for (Player p: players) {
             List<Card> hand = new ArrayList<>(p.getHand());
             hand.addAll(communityCards);
             PokerHand eval = HandEval.evaluate(hand);
+            results.put(p, eval);
             System.out.println(p.getName() + " -> " + eval);
         }
+
+        Player winner = results.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElseThrow();
+
+        System.out.println("GANADOR: " + winner.getName());
     }
 
     public String stageName() {
