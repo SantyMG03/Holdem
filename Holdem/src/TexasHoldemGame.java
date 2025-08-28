@@ -5,6 +5,7 @@ public class TexasHoldemGame {
     private List<Player> players;
     private List<Card> communityCards;
     private int stage; // preflop=0, flop=1, turn=2, river=3, showdown=3
+    private int pot;
 
     public TexasHoldemGame(int numPlayers) {
         this.deck = new Deck();
@@ -18,6 +19,21 @@ public class TexasHoldemGame {
             p.addCard(deck.draw());
             players.add(p);
         }
+        blinds();
+    }
+
+    private void placeBet(Player p, int amount) {
+        p.bet(amount);
+        pot += amount;
+        System.out.println(p.getName() + " apuestas " + amount + " fichas.");
+    }
+
+    private void blinds() {
+        Player small = players.get(0);
+        Player big = players.get(1);
+
+        placeBet(small, 10);
+        placeBet(big, 20);
     }
 
     public void showStage() {
@@ -79,6 +95,9 @@ public class TexasHoldemGame {
                 .orElseThrow();
 
         System.out.println("GANADOR: " + winner.getName());
+        winner.win(pot);
+        System.out.println(winner.getName() + " gana el bote de " + pot + " fichas!");
+        pot = 0; // Para si se juegan varias rondas seguidas
     }
 
     public String stageName() {
