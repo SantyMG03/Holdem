@@ -13,7 +13,7 @@ public class TexasHoldemGame {
         this.stage = 0;
 
         for (int i = 1; i <= numPlayers; i++) {
-            Player p = new Player("Jugador " + i);
+            Player p = new Player("Jugador " + i, 100);
             p.addCard(deck.draw());
             p.addCard(deck.draw());
             players.add(p);
